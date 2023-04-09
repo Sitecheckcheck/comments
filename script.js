@@ -1,6 +1,5 @@
-import { getComments, deleteComments, addComments } from "./api.js";
+import { getComments, deleteComments, addComments, addLike } from "./api.js";
 import { renderLoginComponent } from "./component.js";
-
 
 // let token = "Bearer cgascsbkas6g5g5g5g5g6gcgascsbkas";
 let token = localStorage.getItem("token");
@@ -12,12 +11,11 @@ let loginDel = localStorage.getItem("loginDel");
 // let loginDel;
 let comments = [];
 
-renderComments();
-fetchRenderComments()
+// renderComments();
+fetchRenderComments();
 likeButton();
 
 function fetchRenderComments() {
-  
   return getComments()
     .then((responseData) => {
       const options = {
@@ -35,7 +33,7 @@ function fetchRenderComments() {
           date: new Date(comment.date).toLocaleString("ru-RU", options),
           text: comment.text,
           likes: comment.likes,
-          isLike: false,
+          isLiked: comment.isLiked,
           login: comment.author.login,
           commentId: comment.id,
           userId: comment.author.id,
@@ -43,6 +41,7 @@ function fetchRenderComments() {
       });
 
       comments = appComments;
+      console.log(comments);
       renderComments();
     })
     .catch((error) => {
@@ -58,15 +57,15 @@ function renderComments() {
       appEl,
       setToken: (newToken) => {
         token = newToken;
-        localStorage.setItem('token', token)
+        localStorage.setItem("token", token);
       },
       setName: (newName) => {
         name = newName;
-        localStorage.setItem('name', name)
+        localStorage.setItem("name", name);
       },
       setLogin: (newLogin) => {
         loginDel = newLogin;
-        localStorage.setItem('loginDel', loginDel)
+        localStorage.setItem("loginDel", loginDel);
       },
       fetchRenderComments,
       renderComments,
@@ -90,9 +89,9 @@ function renderComments() {
       <div class="comment-footer">
         <div class="likes">
           <span class="likes-counter">${comment.likes}</span>
-          <button data-index ='${index}' class="like-button ${
-        comment.isLike ? "-active-like" : ""
-      }"></button>
+          <button data-index ='${index}' data-id = ${
+        comment.commentId
+      } class="like-button ${comment.isLiked ? "-active-like" : ""}"></button>
         </div>
       </div>
       <div >
@@ -180,27 +179,6 @@ function renderComments() {
   inputClick();
 }
 
-function likeButton() {
-  const likeElements = document.querySelectorAll(".like-button");
-  for (const i of likeElements) {
-    i.addEventListener("click", (event) => {
-      event.stopPropagation();
-      i.classList.add("-loading-like");
-      delay(500).then(() => {
-        if (i.classList.contains("-active-like")) {
-          comments[i.dataset.index].isLike = false;
-          comments[i.dataset.index].likes -= 1;
-        } else {
-          comments[i.dataset.index].isLike = true;
-          comments[i.dataset.index].likes++;
-        }
-        i.classList.remove("-loading-like");
-        renderComments();
-      });
-    });
-  }
-}
-
 function delay(interval = 300) {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -218,9 +196,27 @@ function inputClick() {
   }
 }
 
-// const nameInputElement = document.getElementById("name-input");
-// const listElement = document.getElementById("list");
-// const inputElement = document.getElementById("input-box");
+function likeButton() {
+  const likeElements = document.querySelectorAll(".like-button");
+  for (const i of likeElements) {
+    i.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      const id = i.dataset.id;
+      addLike(token, id)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          comments[i.dataset.index].likes = data.result.likes;
+          comments[i.dataset.index].isLiked = data.result.likes;
+
+          renderComments();
+        });
+    });
+  }
+}
 
 // document.addEventListener("keyup", function (e) {
 //   if (e.keyCode === 13) {
