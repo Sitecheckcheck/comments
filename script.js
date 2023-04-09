@@ -1,18 +1,23 @@
 import { getComments, deleteComments, addComments } from "./api.js";
 import { renderLoginComponent } from "./component.js";
 
-let name;
-let loginDel
-// let token = "Bearer cgascsbkas6g5g5g5g5g6gcgascsbkas";
-let token = null;
 
+// let token = "Bearer cgascsbkas6g5g5g5g5g6gcgascsbkas";
+let token = localStorage.getItem("token");
+let name = localStorage.getItem("name");
+let loginDel = localStorage.getItem("loginDel");
+// localStorage.clear();
+// let name;
+// let token;
+// let loginDel;
 let comments = [];
 
-// fetchRenderComments()
 renderComments();
+fetchRenderComments()
 likeButton();
 
 function fetchRenderComments() {
+  
   return getComments()
     .then((responseData) => {
       const options = {
@@ -36,14 +41,13 @@ function fetchRenderComments() {
           userId: comment.author.id,
         };
       });
-      
+
       comments = appComments;
       renderComments();
     })
     .catch((error) => {
       alert("Кажется, у вас сломался интернет, попробуйте позже");
     });
-    
 }
 
 function renderComments() {
@@ -54,12 +58,15 @@ function renderComments() {
       appEl,
       setToken: (newToken) => {
         token = newToken;
+        localStorage.setItem('token', token)
       },
       setName: (newName) => {
         name = newName;
+        localStorage.setItem('name', name)
       },
       setLogin: (newLogin) => {
         loginDel = newLogin;
+        localStorage.setItem('loginDel', loginDel)
       },
       fetchRenderComments,
       renderComments,
@@ -142,8 +149,7 @@ function renderComments() {
       .catch((error) => {
         console.log(error);
         if (
-          error.message ===
-            "Комментарий должен быть не короче 3 символов" ||
+          error.message === "Комментарий должен быть не короче 3 символов" ||
           error.message === "Что то пошло не так"
         ) {
           alert(error.message);
