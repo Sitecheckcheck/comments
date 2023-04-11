@@ -1,5 +1,7 @@
 import { getComments, deleteComments, addComments, addLike } from "./api.js";
 import { renderLoginComponent } from "./component.js";
+import { formatDateToRu, formatDateToUs } from "./lib/formatDate/formatDate.js"
+import { format } from "date-fns";
 
 // let token = "Bearer cgascsbkas6g5g5g5g5g6gcgascsbkas";
 let token = localStorage.getItem("token");
@@ -18,19 +20,19 @@ likeButton();
 function fetchRenderComments() {
   return getComments()
     .then((responseData) => {
-      const options = {
-        year: "2-digit",
-        month: "numeric",
-        day: "numeric",
-        timezone: "UTC",
-        hour: "numeric",
-        minute: "2-digit",
-      };
+      // const options = {
+      //   year: "2-digit",
+      //   month: "numeric",
+      //   day: "numeric",
+      //   timezone: "UTC",
+      //   hour: "numeric",
+      //   minute: "2-digit",
+      // };
 
       const appComments = responseData.comments.map((comment) => {
         return {
           name: comment.author.name,
-          date: new Date(comment.date).toLocaleString("ru-RU", options),
+          date: format(new Date(comment.date), 'yyyy-MM-dd hh.mm.ss'),
           text: comment.text,
           likes: comment.likes,
           isLiked: comment.isLiked,
@@ -41,7 +43,6 @@ function fetchRenderComments() {
       });
 
       comments = appComments;
-      console.log(comments);
       renderComments();
     })
     .catch((error) => {
