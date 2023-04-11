@@ -62,3 +62,13 @@ export function registerUser({ name, login, password }) {
       return response.json();
     });
   }
+
+  export function addLike(token, id) {
+    return fetch(
+      "https://webdev-hw-api.vercel.app/api/v2/pavel-danilov/comments/" + id + "/toggle-like",
+      {
+        method: "POST",
+        headers: { Authorization: token },
+      }
+    );
+  }
