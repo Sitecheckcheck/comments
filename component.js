@@ -1,4 +1,6 @@
 import { loginUser, registerUser, getComments } from "./api.js";
+import _ from "lodash";
+import { format } from "date-fns";
 
 export function renderLoginComponent({
   appEl,
@@ -16,19 +18,10 @@ export function renderLoginComponent({
 
     if (isStart) {
       getComments().then((responseData) => {
-        const options = {
-          year: "2-digit",
-          month: "numeric",
-          day: "numeric",
-          timezone: "UTC",
-          hour: "numeric",
-          minute: "2-digit",
-        };
-
         const appComments = responseData.comments.map((comment) => {
           return {
             name: comment.author.name,
-            date: new Date(comment.date).toLocaleString("ru-RU", options),
+            date: format(new Date(comment.date), "yyyy-MM-dd hh.mm.ss"),
             text: comment.text,
             likes: comment.likes,
             isLike: false,
@@ -168,7 +161,7 @@ export function renderLoginComponent({
           }
 
           registerUser({
-            name: name,
+            name: _.capitalize(name),
             login: login,
             password: password,
           })
