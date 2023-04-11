@@ -209,7 +209,7 @@ function likeButton() {
           return response.json();
         })
         .then((data) => {
-          console.log(data);
+         
           comments[i.dataset.index].likes = data.result.likes;
           comments[i.dataset.index].isLiked = data.result.likes;
 
